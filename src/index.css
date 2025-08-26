@@ -129,3 +129,9 @@ input[type="checkbox"] {
   font-weight: 700;
   padding: 3.2rem 0;
 }
+
+.empty-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

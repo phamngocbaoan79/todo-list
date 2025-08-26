@@ -1,9 +1,11 @@
 import { useState } from "react";
+import Logo from "./components/Logo.js";
+import Form from "./components/Form.js";
+import PackingList from "./components/PackingList.js";
+import Stats from "./components/Stats.js";
 
 const initialItems = [
-  { id: 1, description: "Passports", quantity: 2, packed: false },
-  { id: 2, description: "Socks", quantity: 12, packed: false },
-  { id: 3, description: "Oil", quantity: 100, packed: false },
+  
 ];
 
 export default function App() {
@@ -33,6 +35,10 @@ export default function App() {
     setItems((items) => items.map((item) => item.id === id ? {...item, packed: !item.packed} : item ));
   }
 
+  function clearList() {
+    setItems([]);
+  }
+
   return (
     <div className="app">
       <Logo />
@@ -43,87 +49,8 @@ export default function App() {
         setQuantity={setQuantity}
         handleSubmit={handleSubmit}
       />
-      <PackingList items={items} onDeleteItem={handleDeleteItem} onHandleChecked={handleChecked}/>
+      <PackingList items={items} onDeleteItem={handleDeleteItem} onHandleChecked={handleChecked} handleClearList={clearList}/>
       <Stats items={items}/>
     </div>
-  );
-}
-
-// 🔥 Tách các component ra ngoài để không bị re-mount
-function Logo() {
-  return <h1>🌴 Far Away 🏕️</h1>;
-}
-
-function Form({ description, setDescription, quantity, setQuantity, handleSubmit }) {
-  return (
-    <form className="add-form" onSubmit={handleSubmit}>
-      <h3>What do you need for your trip?</h3>
-      <select value={quantity} onChange={(e) => setQuantity(Number(e.target.value))}>
-        {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
-          <option value={num} key={num}>
-            {num}
-          </option>
-        ))}
-      </select>
-      <input
-        type="text"
-        placeholder="Item..."
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-      <button>Add</button>
-    </form>
-  );
-}
-
-function PackingList({items, onDeleteItem, onHandleChecked}) {
-  return (
-    <div className="list">
-      <ul>
-        {items.length === 0 ? <em className="empty-list">Your list is empty</em> : items.map((item) => (
-          <Item item={item} 
-          key={item.id} 
-          onDeleteItem={onDeleteItem} 
-          onHandleChecked={onHandleChecked}/>
-        )) }
-      </ul>
-
-      <div className="actions">
-        <select>
-          <option value="sort">sort by input order.</option>
-          <option value="description">sort by description</option>
-          <option value="packed">sort by status</option>
-        </select>
-      </div>
-    </div>
-  );
-}
-
-function Item({ item, onDeleteItem , onHandleChecked}) {
-  // Nên dùng onChange + checked thay vì onClick + value để tránh lỗi cũng như đảm bảo tính truy cập, chuẩn React hơn
-  // dùng onClick vẫn chạy bình thường nhưng phải thêm readOnly để không bị lỗi (warning)
-  return (
-    <li>
-      <input type="checkbox" checked={item.packed} readOnly onClick={() => onHandleChecked(item.id)}/>
-      <span style={item.packed ? { textDecoration: "line-through" } : {}}>
-        {item.quantity} {item.description}
-      </span>
-      <button onClick={() => onDeleteItem(item.id)}>❌</button>
-    </li>
-  );
-}
-
-function Stats({ items }) {
-  const numberItems = items.length;
-  const numberPacked = items.filter(item => (item.packed)).length;
-  const percentTage = Math.round((numberPacked / numberItems) * 100);
-  return (
-    <footer className="stats">
-      {
-        percentTage === 100 ? <em>You are ready to go! 🏕️</em> 
-        : <em>💼 You have {numberItems} items on your list and you already packed {numberPacked} ({percentTage} %)
-          </em>
-      }
-    </footer>
   );
 }
